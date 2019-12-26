@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/refresh"
-        android:title="Refresh Devices" />
+        android:title="@string/refresh_devices" />
     <item
         android:id="@+id/baud_rate"
-        android:title="Baud rate" />
+        android:title="@string/baud_rate" />
+    <item
+        android:id="@+id/idTest"
+        android:title="@string/test" />
 </menu>

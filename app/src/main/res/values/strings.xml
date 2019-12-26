@@ -1,4 +1,7 @@
 <resources>
-    <string name="app_name">Simple USB Terminal</string>
+    <string name="app_name">LirSync</string>
     <string name="devices">USB Devices</string>
+    <string name="baud_rate">Baud rate</string>
+    <string name="test">Test</string>
+    <string name="refresh_devices">Refresh Devices</string>
 </resources>

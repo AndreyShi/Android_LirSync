@@ -154,7 +154,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         receiveText.setMovementMethod(ScrollingMovementMethod.getInstance());
         TextView sendText = view.findViewById(R.id.send_text);
         View sendBtn = view.findViewById(R.id.send_btn);
-        sendBtn.setOnClickListener(v -> send(sendText.getText().toString()));
+        sendBtn.setOnClickListener(v -> send(sendText.getText().toString(),getActivity()));
         return view;
     }
 
@@ -252,9 +252,9 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         socket = null;
     }
 
-    private void send(String str) {
+    public void send(String str,Context context) {
         if(connected != Connected.True) {
-            Toast.makeText(getActivity(), "not connected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "not connected", Toast.LENGTH_SHORT).show();
             return;
         }
         try {

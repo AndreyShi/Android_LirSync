@@ -111,7 +111,12 @@ public class DevicesFragment extends ListFragment {
             });
             builder.create().show();
             return true;
-        } else {
+        } else if(id == R.id.idTest){
+            TerminalFragment t = new TerminalFragment();
+            t.send("123",getActivity());// проверить на устройстве
+            return true;
+        }
+        else {
             return super.onOptionsItemSelected(item);
         }
     }
