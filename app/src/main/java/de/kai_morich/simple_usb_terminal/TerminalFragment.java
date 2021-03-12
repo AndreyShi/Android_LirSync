@@ -12,8 +12,10 @@ import android.content.ServiceConnection;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -34,6 +36,16 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
+import java.util.concurrent.TimeUnit;
+
+import static android.os.SystemClock.sleep;
+
+
+
+
+
+
+
 public class TerminalFragment extends Fragment implements ServiceConnection, SerialListener {
 
     private enum Connected { False, Pending, True }
@@ -50,6 +62,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private boolean initialStart = true;
     private Connected connected = Connected.False;
     private BroadcastReceiver broadcastReceiver;
+    private boolean testOn;
+    MyTask mt;
 
     public TerminalFragment() {
         broadcastReceiver = new BroadcastReceiver() {
@@ -62,7 +76,47 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
             }
         };
     }
+    //====поток
+    class MyTask extends AsyncTask<Void, Void, Void> {
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //tvInfo.setText("Begin");
+            status("Test Begin");
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            while(testOn){
+                byte data[] = new byte[8];
+                data[0] = 0;
+                data[1] = 8;
+                data[2] = 1;
+                data[3] = 0x55;
+                data[4] = 0x55;
+                data[5] = 0x55;
+                data[6] = 0x55;
+                data[7] = 16;
+                try {
+                    socket.write(data);
+                }
+                catch (Exception e) {
+                    onSerialIoError(e);
+                }
+                sleep(250);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            //tvInfo.setText("End");
+            status("Test End");
+        }
+    }
+    //===
     /*
      * Lifecycle
      */
@@ -139,10 +193,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     }
 
     @Override
-    public void onServiceDisconnected(ComponentName name) {
-        service = null;
-    }
-
+    public void onServiceDisconnected(ComponentName name) { service = null; }
     /*
      * UI
      */
@@ -164,12 +215,13 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     }
 
     @Override
+    //=========================Меню========================
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.clear) {
             receiveText.setText("");
             return true;
-        } else if (id ==R.id.newline) {
+        } else if (id == R.id.newline) {
             String[] newlineNames = getResources().getStringArray(R.array.newline_names);
             String[] newlineValues = getResources().getStringArray(R.array.newline_values);
             int pos = java.util.Arrays.asList(newlineValues).indexOf(newline);
@@ -181,11 +233,36 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
             });
             builder.create().show();
             return true;
-        } else {
+        }
+        else if(id == R.id.idTest){
+            //TerminalFragment t = new TerminalFragment();
+           /* for(int i = 0 ; i < 5;i++) {
+                send("Test", getActivity());// проверить на устройстве
+                sleep(1000);
+            }  */
+            //AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+           // builder.setTitle("Тест");
+            //builder.create().show();
+
+            if(testOn) {
+                item.setTitle("Тест - старт");
+                testOn = false;
+            }
+            else {
+                item.setTitle("Тест - стоп");
+                mt = new MyTask();
+                mt.execute();
+                testOn = true;
+            }
+
+            return true;
+        }
+        else {
             return super.onOptionsItemSelected(item);
         }
+        //добавить сюда функцию теста
     }
-
+    //=====================================================
     /*
      * Serial + UI
      */
@@ -278,7 +355,12 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     }
 
     private void receive(byte[] data) {
-        receiveText.append(new String(data));
+
+        String tmp = new String(data) + '\n';
+
+        receiveText.append(tmp);
+        //receiveText.append(String.format("%X %X %X %X %X %X %X %X\n",data[0],data[1],data[2],data[3],data[4],data[5],data[6],data[7]));
+        receiveText.append(String.format("%d\n",tmp.length()));
     }
 
     private void status(String str) {

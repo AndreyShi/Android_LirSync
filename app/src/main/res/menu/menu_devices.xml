@@ -7,7 +7,4 @@
     <item
         android:id="@+id/baud_rate"
         android:title="@string/baud_rate" />
-    <item
-        android:id="@+id/idTest"
-        android:title="@string/test" />
 </menu>

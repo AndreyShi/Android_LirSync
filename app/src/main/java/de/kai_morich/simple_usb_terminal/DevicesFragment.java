@@ -41,7 +41,7 @@ public class DevicesFragment extends ListFragment {
     private ArrayList<ListItem> listItems = new ArrayList<>();
     private ArrayAdapter<ListItem> listAdapter;
 
-    private int baudRate = 19200;
+    private int baudRate = 200000;
 
     public DevicesFragment() {
     }
@@ -93,6 +93,7 @@ public class DevicesFragment extends ListFragment {
     }
 
     @Override
+    //=======================Меню==================================
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.refresh) {
@@ -102,7 +103,7 @@ public class DevicesFragment extends ListFragment {
             final String[] baudRates = getResources().getStringArray(R.array.baud_rates);
             int pos = java.util.Arrays.asList(baudRates).indexOf(String.valueOf(baudRate));
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Baud rate");
+            builder.setTitle("Скорость");
             builder.setSingleChoiceItems(baudRates, pos, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
                     baudRate = Integer.valueOf(baudRates[item]);
@@ -111,16 +112,12 @@ public class DevicesFragment extends ListFragment {
             });
             builder.create().show();
             return true;
-        } else if(id == R.id.idTest){
-            TerminalFragment t = new TerminalFragment();
-            t.send("123",getActivity());// проверить на устройстве
-            return true;
         }
         else {
             return super.onOptionsItemSelected(item);
         }
     }
-
+    //===============================================================
     void refresh() {
         UsbManager usbManager = (UsbManager) getActivity().getSystemService(Context.USB_SERVICE);
         UsbSerialProber usbDefaultProber = UsbSerialProber.getDefaultProber();
@@ -142,6 +139,7 @@ public class DevicesFragment extends ListFragment {
     }
 
     @Override
+    //== нажатие на устройство в списке
     public void onListItemClick(ListView l, View v, int position, long id) {
         ListItem item = listItems.get(position-1);
         if(item.driver == null) {
@@ -156,5 +154,6 @@ public class DevicesFragment extends ListFragment {
             getFragmentManager().beginTransaction().replace(R.id.fragment, fragment, "terminal").addToBackStack(null).commit();
         }
     }
+    //==
 
 }

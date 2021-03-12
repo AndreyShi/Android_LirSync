@@ -9,4 +9,7 @@
     <item
         android:id="@+id/newline"
         android:title="Newline Mode" />
+    <item
+        android:id="@+id/idTest"
+        android:title="@string/Тест" />
 </menu>
